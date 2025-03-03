@@ -20,7 +20,7 @@ export async function GET() {
   const openedConnections = resultOpenedConnections.rows[0].opened_connections;
 
   return NextResponse.json({
-    update_at: updatedAt,
+    updated_at: updatedAt,
     dependencies: {
       database: {
         version: version,
