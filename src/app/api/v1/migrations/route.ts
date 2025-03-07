@@ -21,10 +21,14 @@ export async function POST() {
 
 async function runMigrations(dryRun: boolean) {
   const dbClient = await database.getNewClient();
+
+  const migrationsPath = join(process.cwd(), "src", "infra", "migrations");
+  console.log("Caminho das migrações: ", migrationsPath); // Debug
+
   const result = await migrationRunner({
     dbClient: dbClient,
     dryRun,
-    dir: join("src", "infra", "migrations"),
+    dir: migrationsPath,
     direction: "up",
     verbose: true,
     migrationsTable: "pgmigrations",
