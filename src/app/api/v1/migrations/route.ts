@@ -4,36 +4,61 @@ import { join } from "path";
 import database from "infra/database";
 
 export async function GET() {
-  const pendingMigrations = await runMigrations(true);
+  try {
+    const pendingMigrations = await runMigrations(true);
 
-  return NextResponse.json(pendingMigrations);
+    return NextResponse.json(pendingMigrations);
+  } catch (error) {
+    console.error("Erro ao verificar migrações pendentes: ", error);
+
+    return NextResponse.json({
+      error: "Erro ao verificar migrações pendentes.",
+      status: 500,
+    });
+  }
 }
 
 export async function POST() {
-  const migratedMigrations = await runMigrations(false);
+  try {
+    const migratedMigrations = await runMigrations(false);
 
-  if (migratedMigrations.length > 0) {
-    return NextResponse.json(migratedMigrations, { status: 201 });
+    if (migratedMigrations.length > 0) {
+      return NextResponse.json(migratedMigrations, { status: 201 });
+    }
+
+    return NextResponse.json(migratedMigrations);
+  } catch (error) {
+    console.error("Erro ao executar migrações pendentes: ", error);
+
+    return NextResponse.json({
+      error: "Erro ao executar migrações pendentes.",
+      status: 500,
+    });
   }
-
-  return NextResponse.json(migratedMigrations);
 }
 
 async function runMigrations(dryRun: boolean) {
-  const dbClient = await database.getNewClient();
+  let dbClient;
 
-  const migrationsPath = join(process.cwd(), "src", "infra", "migrations");
-  console.log("Caminho das migrações: ", migrationsPath); // Debug
+  try {
+    dbClient = await database.getNewClient();
+    const migrationsPath = join(process.cwd(), "src", "infra", "migrations");
 
-  const result = await migrationRunner({
-    dbClient: dbClient,
-    dryRun,
-    dir: migrationsPath,
-    direction: "up",
-    verbose: true,
-    migrationsTable: "pgmigrations",
-  });
-  await dbClient.end();
+    const result = await migrationRunner({
+      dbClient: dbClient,
+      dryRun,
+      dir: migrationsPath,
+      direction: "up",
+      verbose: true,
+      migrationsTable: "pgmigrations",
+    });
 
-  return result;
+    return result;
+  } catch (error) {
+    console.error("Erro ao rodar as migrações: ", error);
+  } finally {
+    if (dbClient) {
+      await dbClient.end();
+    }
+  }
 }
