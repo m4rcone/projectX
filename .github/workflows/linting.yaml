@@ -15,7 +15,7 @@ jobs:
       - run: echo "🩺 This job's status is ${{ job.status }}."
 
   eslint:
-    name: ESlint
+    name: ESLint
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."

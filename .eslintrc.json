@@ -1,5 +1,9 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript",
+    "plugin:jest/recommended"
+  ],
   "overrides": [
     {
       "files": ["src/infra/migrations/**"],
