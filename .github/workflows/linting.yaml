@@ -13,3 +13,16 @@ jobs:
       - run: npm ci
       - run: npm run lint:prettier:check
       - run: echo "🩺 This job's status is ${{ job.status }}."
+
+  eslint:
+    name: ESlint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/iron
+      - run: npm ci
+      - run: npm run lint:eslint:check
+      - run: echo "🩺 This job's status is ${{ job.status }}."
