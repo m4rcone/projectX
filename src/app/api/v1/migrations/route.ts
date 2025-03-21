@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import migrationRunner from "node-pg-migrate";
-import { join } from "path";
+import { resolve } from "path";
 import database from "infra/database";
 
 export async function GET() {
@@ -42,7 +42,7 @@ async function runMigrations(dryRun: boolean) {
 
   try {
     dbClient = await database.getNewClient();
-    const migrationsPath = join(process.cwd(), "src", "infra", "migrations");
+    const migrationsPath = resolve("src", "infra", "migrations");
 
     const result = await migrationRunner({
       dbClient: dbClient,
