@@ -1,16 +1,15 @@
 import { Client } from "pg";
 
 async function query(queryObject: object | string) {
-  let client: Client;
+  let client: Client | undefined;
   try {
     client = await getNewClient();
     const result = await client.query(queryObject);
     return result;
   } catch (error) {
-    console.log(error);
     throw error;
   } finally {
-    await client.end();
+    await client?.end();
   }
 }
 
@@ -23,7 +22,7 @@ async function getNewClient() {
     password: process.env.POSTGRES_PASSWORD,
     ssl: process.env.NODE_ENV === "production" ? true : false,
   });
-  client.connect();
+  await client.connect();
 
   return client;
 }
