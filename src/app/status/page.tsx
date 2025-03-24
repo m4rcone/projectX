@@ -32,6 +32,14 @@ export default function Page() {
 
   return (
     <>
+      <h1>Status:</h1>
+      {isLoading ? (
+        <div>Carregando...</div>
+      ) : error ? (
+        <div>{error.message}</div>
+      ) : (
+        <div>Última atualização: {updatedAtText}</div>
+      )}
       <h2>Banco de dados:</h2>
       {isLoading ? (
         <div>Carregando...</div>
@@ -40,9 +48,9 @@ export default function Page() {
       ) : (
         <>
           <div>Versão do Postgres: {versionText}</div>
-          <div>Conexões máximas: {maxConnectionsText}</div>
-          <div>Conexões abertas: {openedConnectionsText}</div>
-          <p>{updatedAtText}</p>
+          <div>
+            Conexões abertas: {openedConnectionsText} / {maxConnectionsText}
+          </div>
         </>
       )}
     </>
