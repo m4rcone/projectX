@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import database from "infra/database";
-import { InternalServerError } from "infra/errors";
+import { MethodNotAllowedError } from "infra/errors";
+import controller from "infra/controller";
 
 export async function GET() {
   try {
@@ -38,12 +39,28 @@ export async function GET() {
       { status: 200 },
     );
   } catch (error) {
-    const publicErrorObject = new InternalServerError({
-      cause: error,
-    });
-
-    console.error(publicErrorObject);
-
-    return NextResponse.json(publicErrorObject, { status: 500 });
+    return controller.errorHandlerResponse(error);
   }
+}
+
+export function POST() {
+  return methodNotAllowedResponse();
+}
+
+export function PUT() {
+  return methodNotAllowedResponse();
+}
+
+export function DELETE() {
+  return methodNotAllowedResponse();
+}
+
+export function PATCH() {
+  return methodNotAllowedResponse();
+}
+
+function methodNotAllowedResponse() {
+  const publicErrorObject = new MethodNotAllowedError();
+
+  return NextResponse.json(publicErrorObject, { status: 405 });
 }
