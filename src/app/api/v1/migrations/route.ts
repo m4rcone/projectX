@@ -2,19 +2,16 @@ import { NextResponse } from "next/server";
 import migrationRunner from "node-pg-migrate";
 import { resolve } from "path";
 import database from "infra/database";
+import { MethodNotAllowedError, ServiceError } from "infra/errors";
+import controller from "infra/controller";
 
 export async function GET() {
   try {
     const pendingMigrations = await runMigrations(true);
 
-    return NextResponse.json(pendingMigrations);
+    return NextResponse.json(pendingMigrations, { status: 200 });
   } catch (error) {
-    console.error("Erro ao verificar migrações pendentes: ", error);
-
-    return NextResponse.json({
-      error: "Erro ao verificar migrações pendentes.",
-      status: 500,
-    });
+    return controller.errorHandlerResponse(error);
   }
 }
 
@@ -26,14 +23,9 @@ export async function POST() {
       return NextResponse.json(migratedMigrations, { status: 201 });
     }
 
-    return NextResponse.json(migratedMigrations);
+    return NextResponse.json(migratedMigrations, { status: 200 });
   } catch (error) {
-    console.error("Erro ao executar migrações pendentes: ", error);
-
-    return NextResponse.json({
-      error: "Erro ao executar migrações pendentes.",
-      status: 500,
-    });
+    return controller.errorHandlerResponse(error);
   }
 }
 
@@ -45,7 +37,7 @@ async function runMigrations(dryRun: boolean) {
     const migrationsPath = resolve("src", "infra", "migrations");
 
     const result = await migrationRunner({
-      dbClient: dbClient,
+      dbClient,
       dryRun,
       dir: migrationsPath,
       direction: "up",
@@ -55,10 +47,33 @@ async function runMigrations(dryRun: boolean) {
 
     return result;
   } catch (error) {
-    console.error("Erro ao rodar as migrações: ", error);
+    const serviceErrorObject = new ServiceError({
+      cause: error,
+      message: "Erro na conexão com o Database ou ao rodar Migrations.",
+    });
+
+    throw serviceErrorObject;
   } finally {
     if (dbClient) {
-      await dbClient.end();
+      await dbClient?.end();
     }
   }
+}
+
+export function PUT() {
+  return methodNotAllowedResponse();
+}
+
+export function DELETE() {
+  return methodNotAllowedResponse();
+}
+
+export function PATCH() {
+  return methodNotAllowedResponse();
+}
+
+function methodNotAllowedResponse() {
+  const publicErrorObject = new MethodNotAllowedError();
+
+  return NextResponse.json(publicErrorObject, { status: 405 });
 }
