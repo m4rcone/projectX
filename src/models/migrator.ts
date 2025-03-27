@@ -15,7 +15,7 @@ async function runMigrations(dryRun: boolean) {
       dryRun,
       dir: migrationsPath,
       direction: "up",
-      verbose: true,
+      log: () => {},
       migrationsTable: "pgmigrations",
     });
 
