@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import migrationRunner from "node-pg-migrate";
-import { resolve } from "path";
-import database from "infra/database";
-import { MethodNotAllowedError, ServiceError } from "infra/errors";
+import { MethodNotAllowedError } from "infra/errors";
 import controller from "infra/controller";
+import migrator from "models/migrator";
 
 export async function GET() {
   try {
-    const pendingMigrations = await runMigrations(true);
+    const pendingMigrations = await migrator.runMigrations(true);
 
     return NextResponse.json(pendingMigrations, { status: 200 });
   } catch (error) {
@@ -17,7 +15,7 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const migratedMigrations = await runMigrations(false);
+    const migratedMigrations = await migrator.runMigrations(false);
 
     if (migratedMigrations.length > 0) {
       return NextResponse.json(migratedMigrations, { status: 201 });
@@ -26,37 +24,6 @@ export async function POST() {
     return NextResponse.json(migratedMigrations, { status: 200 });
   } catch (error) {
     return controller.errorHandlerResponse(error);
-  }
-}
-
-async function runMigrations(dryRun: boolean) {
-  let dbClient;
-
-  try {
-    dbClient = await database.getNewClient();
-    const migrationsPath = resolve("src", "infra", "migrations");
-
-    const result = await migrationRunner({
-      dbClient,
-      dryRun,
-      dir: migrationsPath,
-      direction: "up",
-      verbose: true,
-      migrationsTable: "pgmigrations",
-    });
-
-    return result;
-  } catch (error) {
-    const serviceErrorObject = new ServiceError({
-      cause: error,
-      message: "Erro na conexão com o Database ou ao rodar Migrations.",
-    });
-
-    throw serviceErrorObject;
-  } finally {
-    if (dbClient) {
-      await dbClient?.end();
-    }
   }
 }
 
