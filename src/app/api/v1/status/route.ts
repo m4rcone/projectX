@@ -44,23 +44,25 @@ export async function GET() {
 }
 
 export function POST() {
-  return methodNotAllowedResponse();
+  const publicErrorObject = new MethodNotAllowedError();
+
+  return controller.errorHandlerResponse(publicErrorObject);
 }
 
 export function PUT() {
-  return methodNotAllowedResponse();
+  const publicErrorObject = new MethodNotAllowedError();
+
+  return controller.errorHandlerResponse(publicErrorObject);
 }
 
 export function DELETE() {
-  return methodNotAllowedResponse();
+  const publicErrorObject = new MethodNotAllowedError();
+
+  return controller.errorHandlerResponse(publicErrorObject);
 }
 
 export function PATCH() {
-  return methodNotAllowedResponse();
-}
-
-function methodNotAllowedResponse() {
   const publicErrorObject = new MethodNotAllowedError();
 
-  return NextResponse.json(publicErrorObject, { status: 405 });
+  return controller.errorHandlerResponse(publicErrorObject);
 }
