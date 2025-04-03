@@ -1,8 +1,21 @@
 import { NextResponse } from "next/server";
-import { InternalServerError } from "./errors";
+import {
+  InternalServerError,
+  MethodNotAllowedError,
+  NotFoundError,
+  ValidationError,
+} from "./errors";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function errorHandlerResponse(error: Error | any) {
+  if (
+    error instanceof MethodNotAllowedError ||
+    ValidationError ||
+    NotFoundError
+  ) {
+    return NextResponse.json(error, { status: error.statusCode });
+  }
+
   const publicErrorObject = new InternalServerError({
     cause: error,
     statusCode: error.statusCode,

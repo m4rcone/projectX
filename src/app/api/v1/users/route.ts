@@ -1,30 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { MethodNotAllowedError } from "infra/errors";
+import user from "models/user";
 import controller from "infra/controller";
-import migrator from "models/migrator";
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    const pendingMigrations = await migrator.runMigrations(true);
+    const userInputValues = await request.json();
+    const newUser = await user.create(userInputValues);
 
-    return NextResponse.json(pendingMigrations, { status: 200 });
+    return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     return controller.errorHandlerResponse(error);
   }
 }
 
-export async function POST() {
-  try {
-    const migratedMigrations = await migrator.runMigrations(false);
+export async function GET() {
+  const publicErrorObject = new MethodNotAllowedError();
 
-    if (migratedMigrations.length > 0) {
-      return NextResponse.json(migratedMigrations, { status: 201 });
-    }
-
-    return NextResponse.json(migratedMigrations, { status: 200 });
-  } catch (error) {
-    return controller.errorHandlerResponse(error);
-  }
+  return controller.errorHandlerResponse(publicErrorObject);
 }
 
 export function PUT() {
