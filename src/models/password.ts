@@ -20,10 +20,7 @@ function getNumberOfRounds() {
 }
 
 function getPepper() {
-  const pepper =
-    process.env.NODE_ENV === "production"
-      ? process.env.PEPPER
-      : "CAROLINA_REAPER";
+  const pepper = process.env.PEPPER;
 
   if (!pepper) {
     console.log("PEPPER não definido no ambiente de produção.");
