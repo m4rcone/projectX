@@ -107,6 +107,8 @@ describe("PATCH /api/v1/users/[username]", () => {
         }),
       });
 
+      expect(email1Response.status).toBe(201);
+
       const email2Response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -118,6 +120,8 @@ describe("PATCH /api/v1/users/[username]", () => {
           password: "abc123",
         }),
       });
+
+      expect(email2Response.status).toBe(201);
 
       const response = await fetch(
         "http://localhost:3000/api/v1/users/email2",
@@ -155,6 +159,8 @@ describe("PATCH /api/v1/users/[username]", () => {
           password: "abc123",
         }),
       });
+
+      expect(responsePOST.status).toBe(201);
 
       const responsePATCH = await fetch(
         "http://localhost:3000/api/v1/users/username",
