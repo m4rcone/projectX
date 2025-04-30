@@ -52,7 +52,45 @@ describe("POST /api/v1/users", () => {
       expect(incorrectPassword).toBe(false);
     });
 
-    test("With duplicated email", async () => {
+    test("With duplicated 'username'", async () => {
+      const response1 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "usernameduplicado",
+          email: "usernameduplicado@email.com",
+          password: "abc123",
+        }),
+      });
+
+      expect(response1.status).toBe(201);
+
+      const response2 = await fetch("http://localhost:3000/api/v1/users", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "Usernameduplicado",
+          email: "usernameduplicado2@email.com",
+          password: "abc123",
+        }),
+      });
+      const response2Body = await response2.json();
+
+      expect(response2.status).toBe(400);
+
+      expect(response2Body).toEqual({
+        name: "ValidationError",
+        message: "O username informado já está sendo utilizado.",
+        action: "Utilize outro username para realizar a operação.",
+        status_code: 400,
+      });
+    });
+
+    test("With duplicated 'email'", async () => {
       const response1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
@@ -85,45 +123,7 @@ describe("POST /api/v1/users", () => {
       expect(response2Body).toEqual({
         name: "ValidationError",
         message: "O email informado já está sendo utilizado.",
-        action: "Utilize outro email para realizar o cadastro.",
-        status_code: 400,
-      });
-    });
-
-    test("With duplicated username", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "usernameduplicado",
-          email: "usernameduplicado@email.com",
-          password: "abc123",
-        }),
-      });
-
-      expect(response1.status).toBe(201);
-
-      const response2 = await fetch("http://localhost:3000/api/v1/users", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          username: "Usernameduplicado",
-          email: "usernameduplicado2@email.com",
-          password: "abc123",
-        }),
-      });
-      const response2Body = await response2.json();
-
-      expect(response2.status).toBe(400);
-
-      expect(response2Body).toEqual({
-        name: "ValidationError",
-        message: "O apelido informado já está sendo utilizado.",
-        action: "Utilize outro apelido para realizar o cadastro.",
+        action: "Utilize outro email para realizar a operação.",
         status_code: 400,
       });
     });
