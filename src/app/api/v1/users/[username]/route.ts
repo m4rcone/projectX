@@ -17,6 +17,21 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ username: string }> },
+) {
+  try {
+    const { username } = await params;
+    const userInputValues = await request.json();
+    const updatedUser = await user.update(username, userInputValues);
+
+    return NextResponse.json(updatedUser, { status: 200 });
+  } catch (error) {
+    return controller.errorHandlerResponse(error);
+  }
+}
+
 export async function POST() {
   const publicErrorObject = new MethodNotAllowedError();
 
@@ -30,12 +45,6 @@ export function PUT() {
 }
 
 export function DELETE() {
-  const publicErrorObject = new MethodNotAllowedError();
-
-  return controller.errorHandlerResponse(publicErrorObject);
-}
-
-export function PATCH() {
   const publicErrorObject = new MethodNotAllowedError();
 
   return controller.errorHandlerResponse(publicErrorObject);
