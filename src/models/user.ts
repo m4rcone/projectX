@@ -2,13 +2,13 @@ import database from "infra/database";
 import { ValidationError, NotFoundError } from "infra/errors";
 import password from "models/password";
 
-type UserInputValues = {
+export type UserInputValues = {
   id?: string;
   username?: string;
   email?: string;
   password?: string;
-  created_at?: string;
-  updated_at?: string;
+  created_at?: Date;
+  updated_at?: Date;
 };
 
 async function findOneByUsername(username: string) {
