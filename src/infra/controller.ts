@@ -3,6 +3,7 @@ import {
   InternalServerError,
   MethodNotAllowedError,
   NotFoundError,
+  UnauthorizedError,
   ValidationError,
 } from "./errors";
 
@@ -10,8 +11,9 @@ import {
 function errorHandlerResponse(error: Error | any) {
   if (
     error instanceof MethodNotAllowedError ||
-    ValidationError ||
-    NotFoundError
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof UnauthorizedError
   ) {
     return NextResponse.json(error, { status: error.statusCode });
   }
@@ -21,7 +23,7 @@ function errorHandlerResponse(error: Error | any) {
     statusCode: error.statusCode,
   });
 
-  console.log(publicErrorObject);
+  console.error(publicErrorObject);
 
   return NextResponse.json(publicErrorObject, {
     status: publicErrorObject.statusCode,

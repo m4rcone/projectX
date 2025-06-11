@@ -34,7 +34,7 @@ const usedFakeUsername = new Set();
 const usedFakeEmail = new Set();
 
 async function createUser(
-  userObject: UserInputValues,
+  userObject?: UserInputValues,
 ): Promise<UserInputValues> {
   let username = userObject?.username;
   let email = userObject?.email;
@@ -64,7 +64,7 @@ async function createUser(
   return await user.create({
     username,
     email,
-    password: userObject.password || "validPassword",
+    password: userObject?.password || "validPassword",
   });
 }
 
