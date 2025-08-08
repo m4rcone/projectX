@@ -11,8 +11,40 @@ export type UserInputValues = {
   updated_at?: Date;
 };
 
+async function findOneById(id: string) {
+  const userFound = await runSelectQuery(id);
+
+  return userFound;
+
+  async function runSelectQuery(id: string) {
+    const result = await database.query({
+      text: `
+        SELECT 
+          *
+        FROM 
+          users
+        WHERE
+          id = $1
+        LIMIT
+          1
+        ;`,
+      values: [id],
+    });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O id informado não foi encontrado no sistema.",
+        action: "Verifique o id informado e tente novamente.",
+      });
+    }
+
+    return result.rows[0];
+  }
+}
+
 async function findOneByUsername(username: string) {
   const userFound = await runSelectQuery(username);
+
   return userFound;
 
   async function runSelectQuery(username: string) {
@@ -201,6 +233,7 @@ async function hashPasswordInObject(userInputValues: UserInputValues) {
 const user = {
   create,
   update,
+  findOneById,
   findOneByUsername,
   findOneByEmail,
 };

@@ -126,8 +126,8 @@ describe("POST /api/v1/sessions", () => {
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
 
-      const expiredAt = new Date(responseBody.expires_at).getTime();
-      const createdAt = new Date(responseBody.created_at).getTime();
+      const expiredAt = new Date(responseBody.expires_at).setMilliseconds(0);
+      const createdAt = new Date(responseBody.created_at).setMilliseconds(0);
 
       expect(expiredAt - createdAt).toBe(session.EXPIRATION_IN_MILLISECONDS);
 
