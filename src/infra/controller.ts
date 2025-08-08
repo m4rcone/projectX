@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as cookie from "cookie";
 import {
   InternalServerError,
   MethodNotAllowedError,
@@ -6,6 +7,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from "./errors";
+import session from "models/session";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function errorHandlerResponse(error: Error | any) {
@@ -30,8 +32,20 @@ function errorHandlerResponse(error: Error | any) {
   });
 }
 
+function setSessionCookie(sessionToken: string, response: NextResponse) {
+  const setCookie = cookie.serialize("session_id", sessionToken, {
+    path: "/",
+    maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  response.headers.set("Set-Cookie", setCookie);
+}
+
 const controller = {
   errorHandlerResponse,
+  setSessionCookie,
 };
 
 export default controller;

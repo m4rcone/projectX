@@ -3,7 +3,6 @@ import { MethodNotAllowedError } from "infra/errors";
 import controller from "infra/controller";
 import authentication from "models/authentication";
 import session from "models/session";
-import * as cookie from "cookie";
 
 export async function POST(request: NextRequest) {
   const userInputValues = await request.json();
@@ -15,16 +14,8 @@ export async function POST(request: NextRequest) {
     );
     const newSession = await session.create(authenticatedUser.id);
 
-    const setCookie = cookie.serialize("session_id", newSession.token, {
-      path: "/",
-      maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    });
-
     const response = NextResponse.json(newSession, { status: 201 });
-
-    response.headers.set("Set-Cookie", setCookie);
+    controller.setSessionCookie(newSession.token, response);
 
     return response;
   } catch (error) {
