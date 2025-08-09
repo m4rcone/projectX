@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const sessionToken = request.cookies.get("session_id").value;
+    const sessionToken = request.cookies.get("session_id")?.value;
 
     const sessionObject = await session.findOneValidByToken(sessionToken);
     const userFound = await user.findOneById(sessionObject.user_id);
