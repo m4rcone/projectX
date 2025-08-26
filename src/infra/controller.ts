@@ -14,10 +14,17 @@ function errorHandlerResponse(error: Error | any) {
   if (
     error instanceof MethodNotAllowedError ||
     error instanceof ValidationError ||
-    error instanceof NotFoundError ||
-    error instanceof UnauthorizedError
+    error instanceof NotFoundError
   ) {
     return NextResponse.json(error, { status: error.statusCode });
+  }
+
+  if (error instanceof UnauthorizedError) {
+    const response = NextResponse.json(error, { status: error.statusCode });
+
+    clearSessionCookie(response);
+
+    return response;
   }
 
   const publicErrorObject = new InternalServerError({
@@ -43,9 +50,21 @@ function setSessionCookie(sessionToken: string, response: NextResponse) {
   response.headers.set("Set-Cookie", setCookie);
 }
 
+function clearSessionCookie(response: NextResponse) {
+  const setCookie = cookie.serialize("session_id", "invalid", {
+    path: "/",
+    maxAge: -1,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  response.headers.set("Set-Cookie", setCookie);
+}
+
 const controller = {
   errorHandlerResponse,
   setSessionCookie,
+  clearSessionCookie,
 };
 
 export default controller;
